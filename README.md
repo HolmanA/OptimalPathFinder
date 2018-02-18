@@ -4,13 +4,13 @@ This program was written in C++ on a Linux machine and is intended to be run in 
 A more in-depth report on this program including references can be found in the file:
 	report.md
 
-## How to compile:
+## How to compile
 You must first change directories to 'src' in order to compile the program.
 To compile the program, simply use the included makefile and execute the command:
 
 	make
 
-## Program execution:
+## Program execution
 You must first change directories to 'src' in order to execute the program.
 To run the program, execute the command:
 
@@ -21,7 +21,7 @@ To print training data while the program trains, execute the command:
     ./qBot -t
 The '-t' flag tells the program to print training info. This is the command executed for the output script found in '/out/OUTPUT_FILE'.
 
-## Program output:
+## Program output
 The program will initially print information obtained from parsing the room adjacency list file along with some hyper-parameters.
 The program then alerts the user where it will be storing matrix weights.
 Next, the program begins training. If the program was run using the '-t' flag, some training data will be displayed each time a q-matrix value changes.
@@ -33,5 +33,5 @@ A sample of the program's output sequence can be found under:
 	out/OUTPUT_FILE
 Initial Q and R weights are stored in '.out' files within the 'out' directory. At the end of each training iteration, Q-values are stored in a new file within the 'out' directory.
 
-## Notes:
+## Notes
 Due to the way I have decided to store and parse initial room data, the indexes of the Q and R matricies are swapped. Usually 2d arrays have the form X[from][to], however for this project, the Q and R matrices have the form X[to][from].
