@@ -13,6 +13,7 @@
 #define Q_LEARN_H
 
 #include <vector>
+#include <unordered_map>
 
 #include "room.h"
 
@@ -35,6 +36,7 @@ class Q_Learn {
 
 		bool converged = false; //Flag for determining training convergence
         std::vector<Room> states; //Vector holding all the rooms (states) in the system
+		std::unordered_map<std::string, int> room_numbers; //Hash map mapping room numbers to their index in states vector
 
     	// Matrix indices represent M[to_state][from_state]
 		// rather than the usual M[from_state][to_state]

@@ -48,18 +48,11 @@ void Q_Learn::test() {
         } else if (user_input == "all") {
             test_print();
         } else {
-            // User either entered an index or incorrect input
-            try {
-                int index = std::stoi(user_input, nullptr, 10);
-
-                // Check for valid index value
-                if (index >= 0 && index < states.size()) {
-                    find_route(index);
-                } else {
-                    std::cout << "  Invalid Input!\n";
-                }
-            } catch (const std::invalid_argument &a) {
-                std::cout << "  Invalid Input!\n";
+            std::unordered_map<std::string, int>::const_iterator room = room_numbers.find(user_input);
+            if (room == room_numbers.end()) {
+                std::cout << "  Room " << user_input << " Not Found!\n";
+            } else {
+                find_route(room->second);
             }
         }
     }
@@ -89,27 +82,115 @@ void Q_Learn::print_help() {
 }
 
 // Prints a table of all rooms in the system with their corresponding index values
+// Dynamically pads table for visual allignment
 void Q_Learn::print_rooms() {
+    int table_width = 15; //Width of table; Does not include || table borders
+    int col_width = (table_width / 2); //Width of columns in room table; used for padding calculations
+
     std::cout << "\n==========================================================\n\n";
-    std::cout << "      Room Table\n";
-    std::cout << "  ==================\n";
-    std::cout << "  || index | room ||\n";
-    std::cout << "  ------------------\n";
-    for (int i = 0; i < states.size(); i++) {
-        if (i < 10) {
-            std::cout << "  ||   " << i << "   |";
-        } else {
-            std::cout << "  ||  " << i << "   |";
+
+    std::string table_title = "Room Table";
+
+    // Double dash horizontal line
+    std::cout << "  ";
+    for (int i = 0; i < table_width + 4; i++) {
+        std::cout << "=";
+    }
+    std::cout << "\n";
+
+    // Table Header
+    std::cout << "  ||";
+    int left_padding = (table_width - table_title.size()) / 2;
+    int right_padding = table_width - (table_title.size() + left_padding);
+
+    for (int i = 0; i < left_padding; i++) {
+        std::cout << " ";
+    }
+
+    std::cout << table_title;
+
+    for (int i = 0; i < right_padding; i++) {
+        std::cout << " ";
+    }
+
+    std::cout << "||\n";
+
+    // Single dash horizontal line
+    std::cout << "  ";
+    for (int i = 0; i < table_width + 4; i++) {
+        std::cout << "-";
+    }
+    std::cout << "\n";
+
+    for (int i = 0; i < states.size() - 1; i += 2) {
+
+        // Left column
+        std::cout << "  ||";
+        int left_room_length = states[i].get_room_number().size();
+        int left_col_left_padding = (col_width - left_room_length) / 2;
+        int left_col_right_padding = (col_width - (left_col_left_padding + left_room_length));
+
+        for (int j = 0; j < left_col_left_padding; j++) {
+            std::cout << " ";
         }
 
-        // This if statements handle padding and spacing of the table
-        if (states[i].get_room_number().size() == 3) {
-            std::cout << "  " << states[i].get_room_number() << " ||\n";
-        } else {
-            std::cout << " " << states[i].get_room_number() << " ||\n";
+        std::cout << states[i].get_room_number();
+
+        for (int j = 0; j < left_col_right_padding; j++) {
+            std::cout << " ";
         }
+
+        std::cout << "|";
+
+        // Right column
+        int right_room_length = states[i + 1].get_room_number().size();
+        int right_col_left_padding = (col_width - right_room_length) / 2;
+        int right_col_right_padding = (col_width - (right_col_left_padding + right_room_length));
+
+        for (int j = 0; j < right_col_left_padding; j++) {
+            std::cout << " ";
+        }
+
+        std::cout << states[i + 1].get_room_number();
+
+        for (int j = 0; j < right_col_right_padding; j++) {
+            std::cout << " ";
+        }
+        std::cout << "||\n";
     }
-    std::cout << "  ==================\n";
+
+    // Last element in odd number of states
+    if (states.size() % 2 == 1) {
+        std::cout << "  ||";
+        int left_room_length = states[states.size() - 1].get_room_number().size();
+        int left_col_left_padding = (col_width - left_room_length) / 2;
+        int left_col_right_padding = (col_width - (left_col_left_padding + left_room_length));
+
+        for (int i = 0; i < left_col_left_padding; i++) {
+            std::cout << " ";
+        }
+
+        std::cout << states[states.size() - 1].get_room_number();
+
+        for (int i = 0; i < left_col_right_padding; i++) {
+            std::cout << " ";
+        }
+
+        // Empty Column
+        std::cout << "|";
+        for (int i = 0; i < col_width; i++) {
+            std::cout << " ";
+        }
+        std::cout << "||\n";
+    }
+
+    // Double dash horizontal line
+    std::cout << "  ";
+    for (int i = 0; i < table_width + 4; i++) {
+        std::cout << "=";
+    }
+    std::cout << "\n";
+
     std::cout << "  Note: Type 'list' at anytime to bring up the room table shown above\n";
     std::cout << "\n==========================================================\n";
 }
@@ -237,6 +318,7 @@ void Q_Learn::load_states() {
     }
 
     std::string buffer;
+    int index = 0;
 
     // Read file line by line
     while (std::getline(state_stream, buffer)) {
@@ -259,6 +341,9 @@ void Q_Learn::load_states() {
         // Create a room object for the source state and add it to vector of all states
         Room r(source, targets);
         states.push_back(r);
+
+        // Add room number and it's index to map of room numbers
+        room_numbers[source] = index++;
     }
 
     // Print some data on what was parsed
